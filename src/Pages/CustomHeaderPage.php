@@ -84,12 +84,12 @@ class CustomHeaderPage extends Page implements HasForms
 			$plugin->updateSetting('header_content', $data['header_content']);
 			$plugin->updateSetting('footer_content', $data['footer_content']);
 
-			Notification::make('success')
+			Notification::make()
 				->success()
 				->title(__('general.saved'))
 				->send();
 		} catch (\Throwable $th) {
-			Notification::make('error')
+			Notification::make()
 				->danger()
 				->title(__('general.error'))
 				->body(__('general.there_was_error_please_contact_administrator'))
