@@ -4,8 +4,12 @@ namespace CustomHeader;
 
 use App\Classes\Plugin;
 use App\Facades\Hook;
+use CustomHeader\Pages\CustomHeaderPageV3;
 use CustomHeader\Pages\CustomHeaderPage;
+use Filament\Forms\Form;
 use Filament\Panel;
+use Filament\Schemas\Schema;
+use RuntimeException;
 
 class CustomHeaderPlugin extends Plugin
 {
@@ -30,16 +34,34 @@ class CustomHeaderPlugin extends Plugin
 	public function onPanel(Panel $panel): void
 	{
 		$panel->pages([
-			CustomHeaderPage::class,
+			$this->resolvePageClass(),
 		]);
 	}
 
 	public function getPluginPage(): ?string
 	{
 		try {
-			return CustomHeaderPage::getUrl();
+			$page = $this->resolvePageClass();
+
+			return $page::getUrl();
 		} catch (\Throwable $th) {
 			return null;
 		}
+	}
+
+	/**
+	 * @return class-string<\Filament\Pages\Page>
+	 */
+	public function resolvePageClass(): string
+	{
+		if (class_exists(Schema::class)) {
+			return CustomHeaderPage::class;
+		}
+
+		if (class_exists(Form::class)) {
+			return CustomHeaderPageV3::class;
+		}
+
+		throw new RuntimeException('Custom Header requires Filament 3 or Filament 5.');
 	}
 }
